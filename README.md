@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Jamlink Network Dashboard & Receipt</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      margin: 0;
+      background: #f6f8fb;
+      color: #0b1220;
+    }
+
+    header {
+      background-color: #0070ba;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+    }
+
+    header .logo {
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    header .network-name {
+      font-weight: 600;
+      font-size: 18px;
+      flex: 1;
+      text-align: center;
+    }
+
+    header .menu {
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    .section {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 20px rgba(12, 15, 20, 0.03);
+    }
+
+    .section h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .balance {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .disclaimer {
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .currencies {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .currency {
+      background: #f3f6ff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      min-width: 120px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .btn {
+      background: #0b63ff;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 16px;
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0 12px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      margin: 30px 0;
+    }
+
+    /* Receipt section */
+    #receiptSection {
+      display: none;
+    }
+
+    .wrap {
+      max-width: 820px;
+      margin: 40px auto;
+      padding: 20px
+    }
+
+    .card {
+      background: #fff;
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: 0 12px 36px rgba(12, 15, 20, 0.06);
+      text-align: center
+    }
+
+    .successCircle {
+      width: 140px;
+      height: 140px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 6px auto 18px auto;
+      background: linear-gradient(180deg, rgba(20, 164, 77, 0.07), rgba(20, 164, 77, 0.02));
+      border: 10px solid rgba(20, 164, 77, 0.14);
+      box-sizing: border-box;
+    }
+
+    .check {
+      width: 74px;
+      height: 74px;
+      fill: #14a44d;
+      transform: translateY(2px);
+      filter: drop-shadow(0 2px 6px rgba(20, 164, 77, 0.18));
+    }
+
+    h1 {
+      margin: 6px 0 6px 0;
+      font-size: 22px;
+      font-weight: 700
+    }
+
+    .lead {
+      font-size: 18px;
+      margin: 10px 0 14px 0
+    }
+
+    .amountLine {
+      font-weight: 900;
+      font-size: 22px;
+      color: #0b1220;
+      display: inline-block;
+      margin: 0 8px
+    }
+
+    .muted {
+      color: #6b7280;
+      font-size: 13px
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap
+    }
+
+    .btnReceipt {
+      padding: 12px 18px;
+      border-radius: 10px;
+      border: 0;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 15px;
+      box-shadow: 0 6px 18px rgba(11, 99, 255, 0.08);
+    }
+
+    .btnReceipt.primary {
+      background: #0b63ff;
+      color: white
+    }
+
+    .btnReceipt.secondary {
+      background: transparent;
+      border: 1px solid rgba(11, 99, 255, 0.12);
+      color: #0b63ff
+    }
+
+    .disclaimerReceipt {
+      margin-top: 16px;
+      color: #9ca3af;
+      font-size: 12px;
+      line-height: 1.3
+    }
+
+    .loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #0b63ff;
+      z-index: 9999;
+      display: none;
+    }
+
+    .currency-card {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      max-width: 300px;
+      margin-bottom: 16px;
+    }
+
+    .currency-flag img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 12px;
+      object-fit: cover;
+      border: 1px solid #ccc;
+    }
+
+    .currency-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .currency-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #0b1220;
+    }
+
+    .currency-code {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+
+    .currency-amount {
+      font-weight: 700;
+      font-size: 16px;
+      color: #0b63ff;
+      /* Primary blue */
+    }
+
+    .transactions {
+      margin-top: 16px;
+    }
+
+    .transaction {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+    }
+
+    .transaction:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">PayPal</div>
+    <div class="network-name">Jamlink Network</div>
+    <div class="menu">&#9776;</div>
+  </header>
+
+  <div class="container">
+
+    <!-- Dashboard Section -->
+    <div id="dashboardSection" class="section">
+      <h2>Money</h2>
+      <div class="balance" id="dashboardBalance">$180,000,000 USD available</div>
+      <div class="disclaimer">*This amount is an estimate based on the most recent currency conversion rate.</div>
+
+      <div class="currencies">
+        <div class="currency">USD</div>
+        <div class="currency">EUR</div>
+        <div class="currency">GBP</div>
+        <div class="currency">JPY</div>
+        <div class="currency">AUD</div>
+      </div>
+
+      <div class="transactions">
+        <div class="transaction"><span>Payment from John D.</span> <span>+$2,500.00</span></div>
+        <div class="transaction"><span>Payment to Amazon</span> <span>-$120.00</span></div>
+        <div class="transaction"><span>Payment from Alice S.</span> <span>+$5,200.00</span></div>
+        <div class="transaction"><span>Payment to Netflix</span> <span>-$15.99</span></div>
+        <div class="transaction"><span>Refund from Walmart</span> <span>+$45.00</span></div>
+      </div>
+
+      <button class="btn" id="transferMoneyBtn">Transfer Money</button>
+    </div>
+
+    <!-- Transfer Section -->
+    <div id="transferSection" class="section" style="display:none">
+      <h2>Send Money</h2>
+      <label>Recipient Email:</label>
+      <input type="text" id="recipientInput" placeholder="recipient@example.com" />
+      <label>Amount (USD):</label>
+      <input type="number" id="amountInput" placeholder="0" />
+      <button class="btn" id="sendMoneyBtn">Send Money</button>
+    </div>
+
+    <!-- Receipt Section -->
+    <div id="receiptSection" class="wrap">
+      <div class="card" role="main" aria-labelledby="title">
+        <div class="successCircle" aria-hidden="true">
+          <svg class="check" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9.0002 16.2L4.8002 12l-1.4 1.4L9.0002 19 21.0002 7l-1.4-1.4z" />
+          </svg>
+        </div>
+        <h1 id="title">Payment Sent</h1>
+        <div class="lead">
+          You have sent <span id="amountDisplay" class="amountLine">USD 0.00</span>
+          to <span id="recipientDisplay" style="font-weight:800">recipient@example.com</span>
+        </div>
+        <div class="muted" id="txInfo">Transaction ID: <span id="txId">—</span> • Date: <span id="txDate">—</span></div>
+
+        <div class="buttons" style="margin-top:20px">
+          <button class="btnReceipt primary" id="sendMoreBtn">Send more money</button>
+          <button class="btnReceipt secondary" id="goDashboard">Go to summary</button>
+        </div>
+
+        <div class="disclaimerReceipt">
+          <strong>Important:</strong> This is a demo receipt. Not an official PayPal confirmation.
+        </div>
+      </div>
+    </div>
+
+    <!-- Currency Cards -->
+    <footer>
+      <div class="currency-card">
+        <div class="currency-flag">
+          <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="USA Flag" />
+        </div>
+        <div class="currency-info">
+          <div class="currency-name">U.S. Dollar</div>
+          <div class="currency-code">USD</div>
+          <div class="currency-amount" id="currencyAmount">$180,000,000 USD</div>
+        </div>
+      </div>
+      <div class="currency-card">
+        <div class="currency-flag">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Flag_of_Europe.svg" alt="Euro Flag" />
+        </div>
+        <div class="currency-info">
+          <div class="currency-name">Euro</div>
+          <div class="currency-code">EUR</div>
+          <div class="currency-amount">$160,000,000 EUR</div>
+        </div>
+      </div>
+      <div class="currency-card">
+        <div class="currency-flag">
+          <img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" alt="UK Flag" />
+        </div>
+        <div class="currency-info">
+          <div class="currency-name">British Pound</div>
+          <div class="currency-code">GBP</div>
+          <div class="currency-amount">$140,000,000 GBP</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loadingOverlay" id="loadingOverlay">Processing...</div>
+
+  <script>
+    const dashboardSection = document.getElementById('dashboardSection');
+    const transferSection = document.getElementById('transferSection');
+    const receiptSection = document.getElementById('receiptSection');
+    const transferMoneyBtn = document.getElementById('transferMoneyBtn');
+    const sendMoneyBtn = document.getElementById('sendMoneyBtn');
+    const sendMoreBtn = document.getElementById('sendMoreBtn');
+    const goDashboardBtn = document.getElementById('goDashboard');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const recipientInput = document.getElementById('recipientInput');
+    const amountInput = document.getElementById('amountInput');
+    const amountDisplay = document.getElementById('amountDisplay');
+    const recipientDisplay = document.getElementById('recipientDisplay');
+    const txIdEl = document.getElementById('txId');
+    const txDateEl = document.getElementById('txDate');
+    const dashboardBalance = document.getElementById('dashboardBalance');
+    const currencyAmountEl = document.getElementById('currencyAmount');
+    let balance = 180000000; // initial balance
+    transferMoneyBtn.addEventListener('click', () => {
+      dashboardSection.style.display = 'none';
+      transferSection.style.display = 'block';
+    });
+    sendMoneyBtn.addEventListener('click', () => {
+      const recipient = recipientInput.value.trim();
+      const amount = parseFloat(amountInput.value);
+      if (!recipient || isNaN(amount) || amount <= 0) {
+        alert("Please enter valid recipient and amount");
+        return;
+      }
+      if (amount > balance) {
+        alert("Insufficient funds");
+        return;
+      }
+      loadingOverlay.style.display = 'flex';
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+        balance -= amount;
+        dashboardBalance.textContent = '$' + balance.toLocaleString() + ' USD available';
+        currencyAmountEl.textContent = '$' + balance.toLocaleString() + ' USD';
+        amountDisplay.textContent = '$' + amount.toLocaleString() + ' USD';
+        recipientDisplay.textContent = recipient;
+        txIdEl.textContent = 'TRX-' + Math.floor(Math.random() * 1000000);
+        txDateEl.textContent = new Date().toLocaleString();
+        transferSection.style.display = 'none';
+        receiptSection.style.display = 'block';
+        recipientInput.value = '';
+        amountInput.value = '';
+      }, 1500);
+    });
+    goDashboardBtn.addEventListener('click', () => {
+      dashboardSection.style.display = 'block';
+      receiptSection.style.display = 'none';
+    });
+    sendMoreBtn.addEventListener('click', () => {
+      transferSection.style.display = 'block';
+      receiptSection.style.display = 'none';
+    });
+  </script>
+
+</body>
+
+</html>
